@@ -2,14 +2,34 @@
 
 <PageTitle>CRUD - StarTED</PageTitle>
 
-@if (ProgramCourseId != 0)
+@if (!IsNewProgramCourse)
 {
     <h3>CRUD - View/Edit Courses</h3>
+
 }
 else
 {
     <h3>CRUD - Add Courses</h3>
 }
+
+<!--Validation-->
+@if (!string.IsNullOrWhiteSpace(feedback))
+{
+    <div class="alert alert-info">
+        @feedback
+    </div>
+}
+
+@if (errorList.Count > 0)
+{
+    <div class="alert alert-danger">
+        @foreach (var error in errorList)
+        {
+            <p class="m-0">@error</p>
+        }
+    </div>
+}
+
 
 <div class="container border">
     <div class="py-4">
@@ -18,7 +38,7 @@ else
             <div class="row-cols-2 d-flex">
                 <div id="select-program" class="row-cols-2 d-flex">
                     <label class="col-2" for="program-name"> Program:</label>
-                    <select class="form-select" id="program-name" value="@ProgramId">
+                    <select class="form-select" id="program-name" value="@(ProgramId == null ? 0 : ProgramId)">
                         <option selected value="0"> Select a Program</option>
                         @if (Programs != null)
                         {
@@ -40,7 +60,7 @@ else
                 <div id="select-program-course" class="row-cols-2 d-flex">
                     <label for="course-name" class="col-3"> Course:</label>
                     <select class="form-select" id="course-name" value="@ProgramCourseId" @onchange="HandleSelectedCourse">
-                        <option selected value=""> Select a Course</option>
+                        <option selected value="0"> Select a Course</option>
                         @if (CoursesList != null)
                         {
                             foreach (var pc in CoursesList)
@@ -55,100 +75,75 @@ else
                 <section id="section-one" class="">
                     <div class="row-cols-2 d-flex">
                         <label for="course-id" class="form-label col-2">Course Id:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="course-id" @bind="CourseId" />
+                        <input class="form-control" disabled id="course-id" @bind="CourseId" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label for="course-name" class="form-label col-2">Course:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="course-name" @bind="CourseName" />
+                        <input class="form-control" disabled id="course-name" @bind="CourseName" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label for="course-credits" class="col-2">Credits:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="course-credits" @bind="@Credits"/>
+                        <input class="form-control" disabled id="course-credits" @bind="@Credits" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label for="total-hours" class="col-2">Total Hours:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="total-hours" @bind="TotalHours" />
+                        <input class="form-control" disabled id="total-hours" @bind="TotalHours" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label class="form-label col-2" for="course-description">Description:</label>
-                        <textarea disabled="@(Active ? true : false)" class="form-control" rows="3" id="course-description" />
+                        <textarea disabled class="form-control" rows="3" id="course-description" />
                     </div>
                 </section>
 
                 <!--End section-one-->
-                <section id="section-two" class="">
-                    <div class="row-cols-2 d-flex">
-                        <label for="classroom-type" class="col-3">Classroom Type:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="classroom-type" @bind="ClassroomType" />
-                    </div>
+                <section id="section-two" class="">                    
                     <div class="row-cols-2 d-flex">
                         <label for="term" class="col-3">Term:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="term" @bind="Term" />
+                        <input class="form-control" disabled id="term" @bind="Term" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label for="tuition" class="form-label col-3">Tuition:</label>
-                        <input class="form-control" disabled="@(Active ? true : false)" id="tuition" @bind="Tuition" />
+                        <input class="form-control" disabled id="tuition" @bind="Tuition" />
+                    </div>
+                    <div class="row-cols-2 d-flex">
+                        <label for="section-limit" class="col-3">Section Limit:</label>
+                        <input class="form-control" id="section-limit" @bind="SectionLimit" />
                     </div>
                     <div class="row-cols-2 d-flex">
                         <div class="col-5 mx-2 my-0">
                             <label for="required" class="form-label col-7 ">Required:</label>
-                            <input class="form-check-input" type="checkbox" id="required" checked="@(Required ? true : false)" />
+                            <input class="form-check-input" type="checkbox" disabled id="required" checked="@(Required ? true : false)" />
                         </div>
                         <div class="col-5 justify-content-end d-flex my-1">
                             <label for="active" class="form-label">Active:</label>
-                            <input class="form-check-input col-6" type="checkbox" id="active" checked="@(Active ? true : false)">
+                            <input class="form-check-input col-6" type="checkbox" id="active" disabled checked="@(Active ? true : false)">
                         </div>                        
                     </div>
                     <div class="row-cols-2 d-flex">
                         <label for="comments" class="form-label col-3">Comments:</label>
-                        <textarea class="form-control" rows="3" id="comments" />
+                        <textarea class="form-control" rows="3" id="comments" @bind="Comments" />
                     </div>
 
                 </section>
             </div>
             <section id="section-three" class="d-flex">
 
-                @if (ProgramCourseId != 0)
-                {
-                    <div id="menu-buttons" class="w-75 m-auto">
-                        <div>
-                            <button class="btn btn-primary">Save Course</button>
-                        </div>
-                        <div>
-                            <button class="btn btn-danger" @onclick="HandleDeactivate">Deactivate Course</button>
-                        </div>
-
-                        <div>
-                            <a href="/query" class="btn btn-outline-danger">Cancel</a>
-                        </div>
-
-                        <div>
-                            <button class="btn btn-outline-primary">Clear</button>
-                        </div>
+                <div id="menu-buttons" class="w-75 m-auto d-flex">                    
+                    <div>
+                        <button class="btn btn-secondary">Save Course</button>
                     </div>
-                }
-                else
-                {
-                    <div id="menu-buttons" class="w-75 m-auto d-flex">
-                        <div hidden="@(Active ? true : false)">
-                            <button class="btn btn-primary">Add Course</button>
-                        </div>
-                        <div>
-                            <button class="btn btn-secondary">Save Course</button>
-                        </div>
-                        <div>
-                            <button class="btn btn-danger" @onclick="HandleDeactivate">Deactivate Course</button>
-                        </div>
-
-                        <div>
-                            <a href="/query" class="btn btn-outline-danger">Cancel</a>
-                        </div>
-
-                        <div>
-                            <button class="btn btn-outline-primary">Clear</button>
-                        </div>
+                    <div hidden="@IsNewProgramCourse">
+                        <button class="btn btn-danger" @onclick="HandleDeactivate">Deactivate Course</button>
                     </div>
-                }
+
+                    <div>
+                        <a href="/query" class="btn btn-outline-danger">Cancel</a>
+                    </div>
+
+                    <div>
+                        <button class="btn btn-outline-primary" @onclick="ClearFields">Clear</button>
+                    </div>
+                </div>
 
             </section>
 

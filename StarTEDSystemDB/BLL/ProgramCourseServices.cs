@@ -66,6 +66,7 @@ namespace StarTEDSystemDB.BLL
             return _context.ProgramCourses
                 .Where(pc => pc.ProgramCourseId == id)
                 .Include(c => c.Course)
+                .Include (p => p.Program)
                 .FirstOrDefault();
         }
 
@@ -79,11 +80,11 @@ namespace StarTEDSystemDB.BLL
         //    _context.SaveChanges();
         //}
 
-        /// <summary>
-        /// Updates information of a ProgramCourse associated with a given Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
+       /// <summary>
+       /// Update a program course
+       /// </summary>
+       /// <param name="programCourse"></param>
+       /// <exception cref="ArgumentNullException"></exception>
         public void UpdateProgramCourse(ProgramCourse programCourse)
         {
             if (programCourse == null)

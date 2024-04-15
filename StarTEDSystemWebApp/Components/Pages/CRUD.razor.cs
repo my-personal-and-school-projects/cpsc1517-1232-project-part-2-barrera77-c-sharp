@@ -20,9 +20,9 @@ namespace StarTEDSystemWebApp.Components.Pages
         //ProgramCourse Properties
         [Parameter]
         public int ProgramCourseId { get; set; }
-        
+
         [Parameter]
-        public bool Required { get; set; }
+        public bool Required { get; set; } = false;
 
         [Parameter]
         public string Comments { get; set; }
@@ -74,10 +74,12 @@ namespace StarTEDSystemWebApp.Components.Pages
         //Get a list of all courses
         public List<ProgramCourse> CoursesList { get; set; }
 
-        private ProgramCourse ProgramCourse { get; set; }
+        public ProgramCourse ProgramCourse { get; set; }
 
         public List<string> errorList = new List<string>();
         public string feedback { get; set; }
+
+        public bool IsNewProgramCourse { get; set; } = false;
 
 
         /// <summary>
@@ -85,35 +87,18 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// </summary>
         /// <returns></returns>
         protected override Task OnInitializedAsync()
-        {           
+        {
+            IsNewProgramCourse = true;
+
             Programs = ProgramServices.GetAllPrograms();
             CoursesList = ProgramCourseServices.GetAllProgramCourses();
 
-
             if (ProgramCourseId != 0)
             {
+                IsNewProgramCourse = false;
                 ProgramCourses = ProgramCourseServices.GetAllProgramCourses(ProgramCourseId);
-                ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);
-
-                if (ProgramCourse == null)
-                {
-                    errorList.Add($"No course found for id {ProgramCourseId}");
-                }
-                else
-                {
-                    ProgramCourseId = ProgramCourse.ProgramCourseId;
-                    ProgramId = ProgramCourse.ProgramId;
-                    CourseId = ProgramCourse.CourseId;
-                    CourseName = ProgramCourse.Course.CourseName;
-                    Credits = Convert.ToDouble(ProgramCourse.Course.Credits);
-                    Description = ProgramCourse.Course.Description;
-                    ClassroomType = Convert.ToInt32(ProgramCourse.Course.ClassroomType);
-                    Term = Convert.ToInt32(ProgramCourse.Course.Term);
-                    Tuition = Convert.ToDouble(ProgramCourse.Course.Tuition);
-                    Active = ProgramCourse.Active;
-                    Required = ProgramCourse.Required;
-                    Comments = ProgramCourse.Comments;
-                }
+                CreateProgramCourse(ProgramCourseId);
+                ProgramId = ProgramCourse.ProgramId;
             }
 
             return base.OnInitializedAsync();
@@ -141,11 +126,11 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <returns></returns>
         private async Task HandleSelectedCourse(ChangeEventArgs e)
         {
+            
             ProgramCourseId = Convert.ToInt32(e.Value);
-            if (PCourseId != 0)
+            if (ProgramCourseId != 0)
             {
-                //Course = CourseServices.GetCourseById(CourseId);
-                ProgramCourse = ProgramCourseServices.GetProgramCourseById(PCourseId);
+                CreateProgramCourse(ProgramCourseId);
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -156,8 +141,9 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// </summary>
         /// <returns></returns>
         private async Task HandleDeactivate()
-        {
-            if (ProgramCourse.ProgramCourseId != 0)
+        {           
+            
+            if (ProgramCourseId != 0)
             {
                 // Make a JS call to confirm whether to deactivate or not
                 object[] message = new[] { "Are you sure you want to deactivate this course?"};
@@ -166,6 +152,8 @@ namespace StarTEDSystemWebApp.Components.Pages
                 {
                     try
                     {
+                        ProgramCourseServices.DeactivateProgramCourse(ProgramCourse);
+                        
                         feedback = "Course succesfully deactivated";
                     }
                     catch (Exception e)
@@ -175,6 +163,50 @@ namespace StarTEDSystemWebApp.Components.Pages
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Fill up the fields with the program course information
+        /// </summary>
+        /// <param name="programCourseId"></param>
+        private void CreateProgramCourse(int programCourseId)
+        {
+            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);                      
+
+            if (ProgramCourse == null)
+            {
+                errorList.Add($"No course found for id {ProgramCourseId}");
+            }
+            else
+            {
+                ProgramCourseId = ProgramCourse.ProgramCourseId;
+                CourseId = ProgramCourse.CourseId;
+                CourseName = ProgramCourse.Course.CourseName;
+                Credits = Convert.ToDouble(ProgramCourse.Course.Credits);
+                Description = ProgramCourse.Course.Description;
+                ClassroomType = Convert.ToInt32(ProgramCourse.Course.ClassroomType);
+                Term = Convert.ToInt32(ProgramCourse.Course.Term);
+                Tuition = Convert.ToDouble(ProgramCourse.Course.Tuition);
+                Active = ProgramCourse.Active;
+                Required = ProgramCourse.Required;
+                Comments = ProgramCourse.Comments;
+            }
+        }
+
+        private void ClearFields()
+        {
+            ProgramCourseId = 0;
+            ProgramId = 0;
+            CourseId = "";
+            CourseName = "";
+            Credits = 0;
+            Description = "";
+            ClassroomType = 0;
+            Term = 0;
+            Tuition = 0;
+            Active = false;
+            Required = false;
+            Comments = "";            
         }
     }
 }
