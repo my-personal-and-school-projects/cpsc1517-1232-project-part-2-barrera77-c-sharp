@@ -1,0 +1,116 @@
+﻿@page "/query/{ProgramCourseId:int?}"
+
+<PageTitle>Query - StarTED</PageTitle>
+<h3>Query - StarTED</h3>
+
+
+
+<div class="container border py-3">
+    <section>
+        <fieldset>
+            <legend>Program Courses</legend>
+            @* Display the programs *@            
+          <div id="main-menu">
+                @if (Programs == null)
+                {
+                    <div id="menu">
+                        <div>
+                            <p>Loading Programs. . .</p>
+                        </div>
+                    </div>
+
+                    <div id="menu-buttons" class="">
+                        <div>
+                            <button class="btn btn-primary">Show Program Courses</button>
+                        </div>
+                        <div>
+                            <button class="btn btn-outline-primary">Add New ...</button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div id="menu" class="col-8">
+                        <div id="menu-program-courses" >
+                            <label class="col-2" for="program-info">Program:</label>
+                            <select class="form-select" id="program-info" @bind="ProgramId">
+                                <option selected value="0">Select a Program</option>
+                                @if (Programs != null)
+                                {
+                                    foreach (var prog in Programs)
+                                    {
+                                        <option value="@prog.ProgramId">@prog.ProgramName</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div id="menu-buttons" class="col-4">
+                        <div>
+                            <button class="btn btn-primary" @onclick="HandleSelectedProgram">Show Program Courses</button>
+                        </div>
+                        <div>
+                            <a href="/crud?CourseId" class="btn btn-outline-primary">Add New ...</a>
+                        </div>
+                    </div>
+                }                
+          </div>         
+          
+        </fieldset>
+    </section>
+    <section id="program-courses-display">
+        <div id="table-wrapper">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Action</th>
+                        <th>Course Number</th>
+                        <th>Course Name</th>
+                        <th>Required</th>
+                        <th>Section Limit</th>
+                        <th>Credits</th>
+                    </tr>
+                </thead>
+                @if (ProgramCourses != null && ProgramCourses.Count > 0)
+                {
+                    <tbody>
+                        @foreach (var pc in ProgramCourses)
+                        {
+                            <tr>
+                                <td class="text-center"><a href="/crud/@pc.ProgramCourseId">View/Edit</a></td>
+                                <td class="text-center">@pc.CourseId</td>
+                                <td>@pc.Course.CourseName</td>
+                                <td class="text-center">@(pc.Required ? "Yes" : "No")</td>
+                                <td class="text-center">@pc.SectionLimit</td>
+                                <td class="text-center">@pc.Course.Credits</td>
+                            </tr>
+                        }
+                    </tbody>
+                }
+                else
+                {
+                    if (ProgramId != 0)
+                    {
+                        <tr id="table-alert" class="alert alert-warning">
+                            <td colspan="12">
+                                <p class="text-center m-auto"><strong>Sorry, no courses found</strong></p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        <tr id="table-alert" class="alert alert-warning">
+                            <td colspan="12">
+                                <p class="text-center m-auto"><strong>Please select a program to see the courses</strong></p>
+                            </td>
+                        </tr>
+                    }
+
+                }
+               
+            </table>
+        </div>      
+    </section>
+
+</div>
+

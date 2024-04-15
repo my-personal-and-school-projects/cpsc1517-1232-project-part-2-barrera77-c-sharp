@@ -1,0 +1,52 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<h3>Scenario A04: Program Courses</h3>
+
+<div class="card">
+    <div>
+        <h1>CPSC1517-1232 Project - Mar 2024</h1>
+        <h2><strong>Author:</strong> Manuel Alva</h2>
+        <h2><strong>Section:</strong> OE01</h2>
+        <h2><strong>Instructor:</strong> Nathan Humphrey</h2>
+        <h2><strong>Description:</strong></h2>
+        <p><strong>Deliverable 1 - Query Component: </strong>This component allows users to search for program courses by selecting a program from a dropdown menu. <br />
+            It displays a scrollable tabular view of the courses associated with the chosen program.<br />            
+            Aside from the corresponding information to the courses, each row includes essential details and links to the CRUD component for further action.</p>
+        <p><strong>Deliverable 2 - CRUD Component: </strong>This component enables the creation, viewing, updating, and deletion of program courses in the StarTED database.<br />
+            Users can add new courses, select the program from a dropdown, and choose course numbers from a predefined list.<br />
+            Existing courses can be edited or deleted as necessary, with deletion removing the course from the database entirely.<br />
+            Additionally, courses can be marked as inactive instead of being permanently deleted, providing efficient means of managing the program courses data.
+        </p>
+
+        <h2><strong>Known Bugs:</strong></h2>
+        <ul>
+            <li>None so far but please swap connection string from STS2 to STS if needed, as I am using sql validation for my work.</li>
+        </ul>
+    </div>
+</div>
+
+<style>
+    h3 {
+     background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(68, 9, 121, 1) 35%,
+    rgba(0, 212, 255, 1) 100%
+  );
+     color: white;
+     padding: 1rem;
+
+}
+ul li{
+    font-size: 1.5rem;
+}
+
+    .card {
+        margin-top: 1rem;
+        width: 100%;
+        padding: 2rem;
+    }
+</style>
+

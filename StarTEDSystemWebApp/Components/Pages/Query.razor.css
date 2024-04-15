@@ -1,0 +1,99 @@
+﻿body {
+}
+
+h3 {
+    background: linear-gradient( 90deg, rgba(2, 0, 36, 1) 0%, rgba(68, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100% );
+    color: white;
+    padding: 1rem;
+}
+
+thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: black;
+    color: white;
+}
+
+th {
+    text-align: center;
+}
+
+td a {
+    text-decoration: none;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+tr:hover {
+    font-weight: bold;
+}
+
+.container {
+    margin-top: 1rem;
+    margin-bottom: 5rem;
+}
+
+#table-wrapper {
+    max-height: 450px;
+    overflow-y: scroll;
+}
+
+#menu-buttons {
+    display: flex;
+    gap: 1rem;
+}
+
+#menu-buttons div{
+    margin: auto;
+}
+
+#menu {
+    display: flex;
+    padding: .5rem 0;
+}
+
+#main-menu {
+    display: flex;
+    justify-content:space-between; 
+}
+
+#menu-program-courses {
+    display: flex;
+}
+
+#menu-program-courses label {
+    margin: auto;
+    margin-left: 0;
+    margin-right: 1rem;
+}
+
+#program-courses-display {
+    margin-top: 1rem;
+}
+
+@media (max-width: 1200px) {
+    #main-menu {
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+        min-width: 400px;
+    }
+
+    #menu-buttons {      
+        width: 100%;
+        margin: auto; 
+    }
+
+    #menu {
+        width: 100%;
+    }
+
+    #menu-program-courses {
+        width: 100%;
+        margin: auto;
+    }
+}
+

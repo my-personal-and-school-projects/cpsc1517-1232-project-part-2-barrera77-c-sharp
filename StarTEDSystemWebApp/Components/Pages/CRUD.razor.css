@@ -1,0 +1,67 @@
+﻿legend {
+    margin-bottom: 2rem;
+}
+.container {
+    margin-top: 1rem;
+}
+
+
+h3 {
+    background: linear-gradient( 90deg, rgba(2, 0, 36, 1) 0%, rgba(68, 9, 121, 1) 35%, rgba(0, 212, 255, 1) 100% );
+    color: white;
+    padding: 1rem;
+}
+#upper-section {
+
+}
+.form-control {
+    max-width: 60%;
+}
+
+#section-one div, #section-two div {
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+#section-one label, #section-two label {
+    text-align: right;
+}
+
+#required {
+    margin-left: .5rem;   
+    width: 20px;
+    height: 20px;
+}
+
+#active {
+    width: 22px;
+    height: 22px;
+}
+
+#menu-buttons {
+    display: flex;
+    justify-content:space-evenly
+}
+
+#menu-buttons .btn {
+    width: 11rem;
+}
+
+#program-name, #course-name {
+    max-width: 60%;
+}
+
+#select-program, #select-program-course {
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+    #select-program label, #select-program-course label {
+        text-align: right;
+    }
+
+
+
+
+
+
+
