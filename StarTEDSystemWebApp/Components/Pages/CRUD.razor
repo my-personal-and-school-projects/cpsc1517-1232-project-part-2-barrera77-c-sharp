@@ -30,7 +30,6 @@ else
     </div>
 }
 
-
 <div class="container border">
     <div class="py-4">
          <fieldset>
@@ -38,13 +37,13 @@ else
             <div class="row-cols-2 d-flex">
                 <div id="select-program" class="row-cols-2 d-flex">
                     <label class="col-2" for="program-name"> Program:</label>
-                    <select class="form-select" id="program-name" value="@(ProgramId == null ? 0 : ProgramId)">
+                    <select class="form-select" id="program-name" value="@(ProgramId == null ? 0 : ProgramId)" @onchange="HandleSelectedProgram">
                         <option selected value="0"> Select a Program</option>
                         @if (Programs != null)
                         {
                             foreach (var prog in Programs)
                             {
-                                <option value="@prog.ProgramId">@prog.ProgramName</option>
+                                <option value="@ProgramId">@prog.ProgramName</option>
                             }
                         }
                         else
@@ -90,6 +89,10 @@ else
                         <input class="form-control" disabled id="total-hours" @bind="TotalHours" />
                     </div>
                     <div class="row-cols-2 d-flex">
+                        <label for="tprogram-course-id" class="col-2">PC ID:</label>
+                        <input class="form-control" disabled id="program-course-id" @bind="ProgramCourseId" />
+                    </div>
+                    <div class="row-cols-2 d-flex">
                         <label class="form-label col-2" for="course-description">Description:</label>
                         <textarea disabled class="form-control" rows="3" id="course-description" />
                     </div>
@@ -112,7 +115,7 @@ else
                     <div class="row-cols-2 d-flex">
                         <div class="col-5 mx-2 my-0">
                             <label for="required" class="form-label col-7 ">Required:</label>
-                            <input class="form-check-input" type="checkbox" disabled id="required" checked="@(Required ? true : false)" />
+                            <input class="form-check-input" type="checkbox" id="required" checked="@(Required ? true : false)" />
                         </div>
                         <div class="col-5 justify-content-end d-flex my-1">
                             <label for="active" class="form-label">Active:</label>
@@ -130,7 +133,7 @@ else
 
                 <div id="menu-buttons" class="w-75 m-auto d-flex">                    
                     <div>
-                        <button class="btn btn-secondary">Save Course</button>
+                        <button class="btn btn-outline-info" @onclick="HandleSaveProgramCourse">Save Course</button>
                     </div>
                     <div hidden="@IsNewProgramCourse">
                         <button class="btn btn-danger" @onclick="HandleDeactivate">Deactivate Course</button>
@@ -146,12 +149,6 @@ else
                 </div>
 
             </section>
-
-
-         
-
          </fieldset>
-
     </div>
-
 </div>

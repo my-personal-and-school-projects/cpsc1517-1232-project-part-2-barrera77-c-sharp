@@ -74,6 +74,10 @@ tr:hover {
     margin-top: 1rem;
 }
 
+#bnt-new {
+    width: 11rem;
+}
+
 @media (max-width: 1200px) {
     #main-menu {
         display: flex;

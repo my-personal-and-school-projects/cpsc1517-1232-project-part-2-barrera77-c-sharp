@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop;
 using StarTEDSystemDB.BLL;
 using StarTEDSystemDB.Entities;
@@ -97,7 +98,7 @@ namespace StarTEDSystemWebApp.Components.Pages
             {
                 IsNewProgramCourse = false;
                 ProgramCourses = ProgramCourseServices.GetAllProgramCourses(ProgramCourseId);
-                CreateProgramCourse(ProgramCourseId);
+                DisplayProgramCourse(ProgramCourseId);
                 ProgramId = ProgramCourse.ProgramId;
             }
 
@@ -112,11 +113,11 @@ namespace StarTEDSystemWebApp.Components.Pages
         private async Task HandleSelectedProgram(ChangeEventArgs e)
         {
             ProgramId = Convert.ToInt32(e.Value);
-            if (ProgramId != 0)
-            {
-                CoursesList = ProgramCourseServices.GetAllProgramCourses(ProgramId);
-                await InvokeAsync(StateHasChanged);
-            }
+            //if (ProgramId != 0)
+            //{
+            //    CoursesList = ProgramCourseServices.GetAllProgramCourses(ProgramId);
+            //    await InvokeAsync(StateHasChanged);
+            //}
         }
 
         /// <summary>
@@ -130,7 +131,7 @@ namespace StarTEDSystemWebApp.Components.Pages
             ProgramCourseId = Convert.ToInt32(e.Value);
             if (ProgramCourseId != 0)
             {
-                CreateProgramCourse(ProgramCourseId);
+                DisplayProgramCourse(ProgramCourseId);
 
                 await InvokeAsync(StateHasChanged);
             }
@@ -141,8 +142,7 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// </summary>
         /// <returns></returns>
         private async Task HandleDeactivate()
-        {           
-            
+        {                       
             if (ProgramCourseId != 0)
             {
                 // Make a JS call to confirm whether to deactivate or not
@@ -153,15 +153,15 @@ namespace StarTEDSystemWebApp.Components.Pages
                     try
                     {
                         ProgramCourseServices.DeactivateProgramCourse(ProgramCourse);
-                        
+                        ClearFields();
                         feedback = "Course succesfully deactivated";
+                        
                     }
                     catch (Exception e)
                     {
                         errorList.Add(e.Message);
                     }
                 }
-
             }
         }
 
@@ -169,7 +169,7 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// Fill up the fields with the program course information
         /// </summary>
         /// <param name="programCourseId"></param>
-        private void CreateProgramCourse(int programCourseId)
+        private void DisplayProgramCourse(int programCourseId)
         {
             ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);                      
 
@@ -179,7 +179,8 @@ namespace StarTEDSystemWebApp.Components.Pages
             }
             else
             {
-                ProgramCourseId = ProgramCourse.ProgramCourseId;
+                //ProgramCourseId = ProgramCourse.ProgramCourseId;
+                ProgramId = ProgramCourseId;
                 CourseId = ProgramCourse.CourseId;
                 CourseName = ProgramCourse.Course.CourseName;
                 Credits = Convert.ToDouble(ProgramCourse.Course.Credits);
@@ -191,6 +192,62 @@ namespace StarTEDSystemWebApp.Components.Pages
                 Required = ProgramCourse.Required;
                 Comments = ProgramCourse.Comments;
             }
+        }
+
+        private void HandleSaveProgramCourse()
+        {
+
+            if (IsValidProgramCourse())
+            {
+                if (ProgramCourseId == 0)
+                {
+                    if (ProgramCourseServices.ProgramCourseExists(ProgramId, CourseId))
+                    {
+                        errorList.Add("Course already included in the current program");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            ProgramCourseServices.AddProgramCourse(ProgramCourse);
+                            feedback = "Program Course succesfully added";
+                        }
+                        catch (Exception e)
+                        {
+                            errorList.Add(e.Message);
+                        }
+                    }
+                }
+                else
+                {
+                    errorList.Add($"Program course already exists {ProgramCourseId}");
+                }
+
+            }
+            
+        }
+
+        /// <summary>
+        /// Validate fields for the ProgramCourse
+        /// </summary>
+        private bool IsValidProgramCourse()
+        {
+            errorList.Clear();
+
+            if (ProgramCourse.ProgramId == 0)
+            {
+                errorList.Add("Program Id cannot be null");
+            }
+            if (string.IsNullOrWhiteSpace(ProgramCourse.CourseId))
+            {
+                errorList.Add("Course Id cannot be null");
+            }
+            if (!ProgramCourse.Active)
+            {
+                errorList.Add("Program Course cannot be inactive");
+            }       
+
+            return errorList.Count == 0;
         }
 
         private void ClearFields()

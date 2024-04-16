@@ -107,8 +107,36 @@ namespace StarTEDSystemDB.BLL
             {
                 throw new ArgumentNullException("Course cannot be null", new ArgumentNullException());
             }
-            programCourse.Active = false;
+            programCourse.Active = true;
             UpdateProgramCourse(programCourse);
         }
+
+        /// <summary>
+        /// Adds a new ProgramCourse to the programCourse table
+        /// </summary>
+        /// <param name="programCourse"></param>
+        /// <exception cref="ArgumentNullException"></exception>
+        public void AddProgramCourse(ProgramCourse programCourse)
+        {
+            if(programCourse == null)
+            {
+                throw new ArgumentNullException("ProgramCourse cannot be null", new ArgumentNullException());
+            }
+            _context.ProgramCourses.Add(programCourse);
+           // _context.SaveChanges();
+        }
+        
+        /// <summary>
+        /// Checks if the program is not already included in the chosen program
+        /// </summary>
+        /// <param name="programId"></param>
+        /// <param name="courseId"></param>
+        /// <returns></returns>
+        public bool ProgramCourseExists(int programId, string courseId)
+        {
+            // Query the database to see if a ProgramCourse with the specified ProgramId and CourseId exists
+            return _context.ProgramCourses.Any(pc => pc.ProgramId == programId && pc.CourseId == courseId);
+        }
+
     }
 }
