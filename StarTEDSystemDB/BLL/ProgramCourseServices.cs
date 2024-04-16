@@ -123,7 +123,7 @@ namespace StarTEDSystemDB.BLL
                 throw new ArgumentNullException("ProgramCourse cannot be null", new ArgumentNullException());
             }
             _context.ProgramCourses.Add(programCourse);
-           // _context.SaveChanges();
+            _context.SaveChanges();
         }
         
         /// <summary>

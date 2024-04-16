@@ -24,5 +24,12 @@ namespace StarTEDSystemDB.BLL
                 .FirstOrDefault();
         }
 
+        public List<Course> GetAllCourses()
+        {
+            return _context.Courses
+                .OrderBy(c => c.CourseName)
+                .ToList<Course>();
+        }
+
     }
 }

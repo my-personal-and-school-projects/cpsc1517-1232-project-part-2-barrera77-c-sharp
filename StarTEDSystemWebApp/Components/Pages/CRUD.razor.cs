@@ -13,8 +13,13 @@ namespace StarTEDSystemWebApp.Components.Pages
 
         [Inject]
         ProgramServices ProgramServices { get; set; }
+
+        [Inject]
+        CourseServices CourseServices { get; set; }
+
         [Inject]
         ProgramCourseServices ProgramCourseServices { get; set; }
+
         [Inject]
         NavigationManager NavigationManager { get; set; }
         
@@ -57,7 +62,7 @@ namespace StarTEDSystemWebApp.Components.Pages
         public double Tuition { get; set; }
 
         [Parameter]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Parameter]
         public int ProgramId { get; set; }
@@ -73,9 +78,10 @@ namespace StarTEDSystemWebApp.Components.Pages
         public List<ProgramCourse> ProgramCourses { get; set; }
 
         //Get a list of all courses
-        public List<ProgramCourse> CoursesList { get; set; }
+        public List<Course> CoursesList { get; set; }
 
         public ProgramCourse ProgramCourse { get; set; }
+        public Course Course { get; set; }
 
         public List<string> errorList = new List<string>();
         public string feedback { get; set; }
@@ -88,18 +94,19 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// </summary>
         /// <returns></returns>
         protected override Task OnInitializedAsync()
-        {
+        {            
             IsNewProgramCourse = true;
 
             Programs = ProgramServices.GetAllPrograms();
-            CoursesList = ProgramCourseServices.GetAllProgramCourses();
+            CoursesList = CourseServices.GetAllCourses();
 
             if (ProgramCourseId != 0)
             {
-                IsNewProgramCourse = false;
+                IsNewProgramCourse = false;                
                 ProgramCourses = ProgramCourseServices.GetAllProgramCourses(ProgramCourseId);
                 DisplayProgramCourse(ProgramCourseId);
                 ProgramId = ProgramCourse.ProgramId;
+                CourseId = ProgramCourse.CourseId;
             }
 
             return base.OnInitializedAsync();
@@ -127,14 +134,18 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <returns></returns>
         private async Task HandleSelectedCourse(ChangeEventArgs e)
         {
-            
-            ProgramCourseId = Convert.ToInt32(e.Value);
-            if (ProgramCourseId != 0)
-            {
-                DisplayProgramCourse(ProgramCourseId);
+            CourseId = Convert.ToString(e.Value);
 
-                await InvokeAsync(StateHasChanged);
-            }
+            //ProgramCourseId = Convert.ToInt32(e.Value);
+            //if (ProgramCourseId != 0)
+            //{
+            //    DisplayProgramCourse(ProgramCourseId);
+            //    CourseId = ProgramCourse.CourseId;
+
+            //    await InvokeAsync(StateHasChanged);
+            //}
+
+            DisplayProgramCourse(ProgramCourseId);
         }
 
         /// <summary>
@@ -171,36 +182,46 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <param name="programCourseId"></param>
         private void DisplayProgramCourse(int programCourseId)
         {
-            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);                      
+            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);
+            
 
             if (ProgramCourse == null)
             {
-                errorList.Add($"No course found for id {ProgramCourseId}");
+                
+                Course = CourseServices.GetCourseById(CourseId);
             }
             else
             {
-                //ProgramCourseId = ProgramCourse.ProgramCourseId;
-                ProgramId = ProgramCourseId;
-                CourseId = ProgramCourse.CourseId;
-                CourseName = ProgramCourse.Course.CourseName;
-                Credits = Convert.ToDouble(ProgramCourse.Course.Credits);
-                Description = ProgramCourse.Course.Description;
-                ClassroomType = Convert.ToInt32(ProgramCourse.Course.ClassroomType);
-                Term = Convert.ToInt32(ProgramCourse.Course.Term);
-                Tuition = Convert.ToDouble(ProgramCourse.Course.Tuition);
-                Active = ProgramCourse.Active;
-                Required = ProgramCourse.Required;
-                Comments = ProgramCourse.Comments;
+                Course = CourseServices.GetCourseById(ProgramCourse.Course.CourseId);
+                
+                
+                if(ProgramCourseId != 0)
+                {
+                    SectionLimit = ProgramCourse.SectionLimit;
+                    Active = ProgramCourse.Active;
+                    Required = ProgramCourse.Required;
+                    Comments = ProgramCourse.Comments;
+                }
             }
+            //ProgramCourseId = ProgramCourse.ProgramCourseId;                
+            CourseName = Course.CourseName;
+            Credits = Convert.ToDouble(Course.Credits);
+            Description = Course.Description;
+            ClassroomType = Convert.ToInt32(Course.ClassroomType);
+            Term = Convert.ToInt32(Course.Term);
+            Tuition = Convert.ToDouble(Course.Tuition);
+            TotalHours = Convert.ToInt32(Course.TotalHours);
         }
 
         private void HandleSaveProgramCourse()
         {
-
             if (IsValidProgramCourse())
             {
+                ProgramCourse = new();
+
                 if (ProgramCourseId == 0)
                 {
+                    // check if the course already belongs to that program
                     if (ProgramCourseServices.ProgramCourseExists(ProgramId, CourseId))
                     {
                         errorList.Add("Course already included in the current program");
@@ -209,8 +230,11 @@ namespace StarTEDSystemWebApp.Components.Pages
                     {
                         try
                         {
-                            ProgramCourseServices.AddProgramCourse(ProgramCourse);
+                            CreateProgramCourse();
+                            ProgramCourseId = ProgramCourse.ProgramCourseId;
                             feedback = "Program Course succesfully added";
+                            NavigationManager.NavigateTo($"/crud/{ProgramCourseId}");
+                            ClearFields();
                         }
                         catch (Exception e)
                         {
@@ -222,9 +246,23 @@ namespace StarTEDSystemWebApp.Components.Pages
                 {
                     errorList.Add($"Program course already exists {ProgramCourseId}");
                 }
+            }            
+        }
 
-            }
+        private void CreateProgramCourse()
+        {
+            ProgramCourse = new();
+
+            ProgramCourse.Active = Active;
+            ProgramCourse.Required = Required;
+            ProgramCourse.Comments = Comments;
+            ProgramCourse.ProgramId = ProgramId;
+            ProgramCourse.CourseId = CourseId;
+            ProgramCourse.SectionLimit = SectionLimit;
+
             
+
+            ProgramCourseServices.AddProgramCourse(ProgramCourse);
         }
 
         /// <summary>
@@ -234,15 +272,19 @@ namespace StarTEDSystemWebApp.Components.Pages
         {
             errorList.Clear();
 
-            if (ProgramCourse.ProgramId == 0)
+            if (ProgramId == 0)
             {
                 errorList.Add("Program Id cannot be null");
             }
-            if (string.IsNullOrWhiteSpace(ProgramCourse.CourseId))
+            if (string.IsNullOrWhiteSpace(CourseId))
             {
                 errorList.Add("Course Id cannot be null");
             }
-            if (!ProgramCourse.Active)
+            if (SectionLimit == 0)
+            {
+                errorList.Add("Please provide the limit for the section");
+            }
+            if (!Active)
             {
                 errorList.Add("Program Course cannot be inactive");
             }       
@@ -263,7 +305,8 @@ namespace StarTEDSystemWebApp.Components.Pages
             Tuition = 0;
             Active = false;
             Required = false;
-            Comments = "";            
+            Comments = "";  
+            SectionLimit = 0;
         }
     }
 }
