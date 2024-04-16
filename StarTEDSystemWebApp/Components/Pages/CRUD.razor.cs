@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop;
 using StarTEDSystemDB.BLL;
 using StarTEDSystemDB.Entities;
@@ -119,12 +118,7 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <returns></returns>
         private async Task HandleSelectedProgram(ChangeEventArgs e)
         {
-            ProgramId = Convert.ToInt32(e.Value);
-            //if (ProgramId != 0)
-            //{
-            //    CoursesList = ProgramCourseServices.GetAllProgramCourses(ProgramId);
-            //    await InvokeAsync(StateHasChanged);
-            //}
+            ProgramId = Convert.ToInt32(e.Value);           
         }
 
         /// <summary>
@@ -134,17 +128,9 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <returns></returns>
         private async Task HandleSelectedCourse(ChangeEventArgs e)
         {
-            CourseId = Convert.ToString(e.Value);
+            CourseId = Convert.ToString(e.Value);          
 
-            //ProgramCourseId = Convert.ToInt32(e.Value);
-            //if (ProgramCourseId != 0)
-            //{
-            //    DisplayProgramCourse(ProgramCourseId);
-            //    CourseId = ProgramCourse.CourseId;
-
-            //    await InvokeAsync(StateHasChanged);
-            //}
-
+            //Display course details
             DisplayProgramCourse(ProgramCourseId);
         }
 
@@ -177,23 +163,22 @@ namespace StarTEDSystemWebApp.Components.Pages
         }
 
         /// <summary>
-        /// Fill up the fields with the program course information
+        /// Fill up the fields with the program course information based on the access method (NavBar Link, Create New button, etc.).
+        /// If the ProgramCourse is null create a course using the CourseId value from the dropdown course list
+        /// Otherwise use the CourseId from the ProgramCourse 
         /// </summary>
         /// <param name="programCourseId"></param>
         private void DisplayProgramCourse(int programCourseId)
         {
-            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);
-            
+            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);            
 
             if (ProgramCourse == null)
             {
-                
                 Course = CourseServices.GetCourseById(CourseId);
             }
             else
             {
-                Course = CourseServices.GetCourseById(ProgramCourse.Course.CourseId);
-                
+                Course = CourseServices.GetCourseById(ProgramCourse.Course.CourseId);                
                 
                 if(ProgramCourseId != 0)
                 {
@@ -213,6 +198,9 @@ namespace StarTEDSystemWebApp.Components.Pages
             TotalHours = Convert.ToInt32(Course.TotalHours);
         }
 
+        /// <summary>
+        /// Save the newly created ProgramCourse in the DB
+        /// </summary>
         private void HandleSaveProgramCourse()
         {
             if (IsValidProgramCourse())
@@ -249,6 +237,9 @@ namespace StarTEDSystemWebApp.Components.Pages
             }            
         }
 
+        /// <summary>
+        /// Create a new ProgramCourse extracting the values from the form fields
+        /// </summary>
         private void CreateProgramCourse()
         {
             ProgramCourse = new();
@@ -259,8 +250,6 @@ namespace StarTEDSystemWebApp.Components.Pages
             ProgramCourse.ProgramId = ProgramId;
             ProgramCourse.CourseId = CourseId;
             ProgramCourse.SectionLimit = SectionLimit;
-
-            
 
             ProgramCourseServices.AddProgramCourse(ProgramCourse);
         }
@@ -289,9 +278,14 @@ namespace StarTEDSystemWebApp.Components.Pages
                 errorList.Add("Program Course cannot be inactive");
             }       
 
+            //Required and Comments fields seem to be optional in the DB so, no validation was implemented
+
             return errorList.Count == 0;
         }
 
+        /// <summary>
+        /// Clear all form fields and initialize variables
+        /// </summary>
         private void ClearFields()
         {
             ProgramCourseId = 0;

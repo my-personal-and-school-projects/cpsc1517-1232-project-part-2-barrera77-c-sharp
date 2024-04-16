@@ -17,6 +17,12 @@ namespace StarTEDSystemDB.BLL
             _context = context;
         }
 
+
+        /// <summary>
+        /// Get a course by the Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>a course corresponding to a provided Id</returns>
         public Course? GetCourseById(string id)
         {
             return _context.Courses
@@ -24,6 +30,10 @@ namespace StarTEDSystemDB.BLL
                 .FirstOrDefault();
         }
 
+        /// <summary>
+        /// Get a list of all courses
+        /// </summary>
+        /// <returns>list of all courses </returns>
         public List<Course> GetAllCourses()
         {
             return _context.Courses

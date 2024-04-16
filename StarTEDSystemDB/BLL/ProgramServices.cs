@@ -21,7 +21,7 @@ namespace StarTEDSystemDB.BLL
         /// <summary>
         /// Create a list of programs
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A list of all programs</returns>
         public List<Program> GetAllPrograms()
         {
             return _context.Programs

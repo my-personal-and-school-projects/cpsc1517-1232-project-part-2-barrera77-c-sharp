@@ -18,7 +18,7 @@ namespace StarTEDSystemDB.BLL
         /// Get all program courses
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <returns>list of courses </returns>
         public List<ProgramCourse> GetAllProgramCourses()
         {
             return _context.ProgramCourses                
@@ -28,7 +28,7 @@ namespace StarTEDSystemDB.BLL
         }
 
         /// <summary>
-        /// 
+        /// Get a list of all ProgramCourses by id
         /// </summary>
         /// <param name="id"></param>
         /// <returns> list of courses associated with a specific program.</returns>
