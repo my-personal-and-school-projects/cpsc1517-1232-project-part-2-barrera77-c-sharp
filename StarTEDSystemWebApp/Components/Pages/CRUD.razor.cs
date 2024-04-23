@@ -2,6 +2,7 @@
 using Microsoft.JSInterop;
 using StarTEDSystemDB.BLL;
 using StarTEDSystemDB.Entities;
+using System.ComponentModel;
 
 namespace StarTEDSystemWebApp.Components.Pages
 {
@@ -87,6 +88,8 @@ namespace StarTEDSystemWebApp.Components.Pages
 
         public bool IsNewProgramCourse { get; set; } = false;
 
+        public bool EditCourse { get; set; } = false;
+
 
         /// <summary>
         /// Initialize processes
@@ -95,17 +98,24 @@ namespace StarTEDSystemWebApp.Components.Pages
         protected override Task OnInitializedAsync()
         {            
             IsNewProgramCourse = true;
+            EditCourse = true;
 
             Programs = ProgramServices.GetAllPrograms();
             CoursesList = CourseServices.GetAllCourses();
 
             if (ProgramCourseId != 0)
             {
-                IsNewProgramCourse = false;                
+                IsNewProgramCourse = false;
+                EditCourse = false;
+
                 ProgramCourses = ProgramCourseServices.GetAllProgramCourses(ProgramCourseId);
                 DisplayProgramCourse(ProgramCourseId);
                 ProgramId = ProgramCourse.ProgramId;
                 CourseId = ProgramCourse.CourseId;
+            }
+            else
+            {
+                ProgramCourse = new();
             }
 
             return base.OnInitializedAsync();
@@ -130,16 +140,24 @@ namespace StarTEDSystemWebApp.Components.Pages
         {
             CourseId = Convert.ToString(e.Value);          
 
-            //Display course details
-            DisplayProgramCourse(ProgramCourseId);
+            if (!string.IsNullOrWhiteSpace(CourseId))
+            {
+                //Display course details
+                DisplayProgramCourse(ProgramCourseId);
+            }
+            else
+            {
+                ClearFields();
+            }
         }
 
         /// <summary>
-        /// Deactivate a ProgramCourse and display an alert for confirmation
+        /// Deactivate or update a ProgramCourse and display an alert for confirmation
         /// </summary>
         /// <returns></returns>
         private async Task HandleDeactivate()
-        {                       
+        {                     
+            //If 
             if (ProgramCourseId != 0)
             {
                 // Make a JS call to confirm whether to deactivate or not
@@ -152,6 +170,7 @@ namespace StarTEDSystemWebApp.Components.Pages
                         ProgramCourseServices.DeactivateProgramCourse(ProgramCourse);
                         ClearFields();
                         feedback = "Course succesfully deactivated";
+                        NavigationManager.NavigateTo("/crud"); 
                         
                     }
                     catch (Exception e)
@@ -159,7 +178,7 @@ namespace StarTEDSystemWebApp.Components.Pages
                         errorList.Add(e.Message);
                     }
                 }
-            }
+            }           
         }
 
         /// <summary>
@@ -170,7 +189,7 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// <param name="programCourseId"></param>
         private void DisplayProgramCourse(int programCourseId)
         {
-            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);            
+            ProgramCourse = ProgramCourseServices.GetProgramCourseById(ProgramCourseId);
 
             if (ProgramCourse == null)
             {
@@ -178,9 +197,9 @@ namespace StarTEDSystemWebApp.Components.Pages
             }
             else
             {
-                Course = CourseServices.GetCourseById(ProgramCourse.Course.CourseId);                
-                
-                if(ProgramCourseId != 0)
+                Course = CourseServices.GetCourseById(ProgramCourse.Course.CourseId);
+
+                if (ProgramCourseId != 0)
                 {
                     SectionLimit = ProgramCourse.SectionLimit;
                     Active = ProgramCourse.Active;
@@ -188,14 +207,22 @@ namespace StarTEDSystemWebApp.Components.Pages
                     Comments = ProgramCourse.Comments;
                 }
             }
-            //ProgramCourseId = ProgramCourse.ProgramCourseId;                
-            CourseName = Course.CourseName;
-            Credits = Convert.ToDouble(Course.Credits);
-            Description = Course.Description;
-            ClassroomType = Convert.ToInt32(Course.ClassroomType);
-            Term = Convert.ToInt32(Course.Term);
-            Tuition = Convert.ToDouble(Course.Tuition);
-            TotalHours = Convert.ToInt32(Course.TotalHours);
+
+            try
+            {
+                //ProgramCourseId = ProgramCourse.ProgramCourseId;                
+                CourseName = Course.CourseName;
+                Credits = Convert.ToDouble(Course.Credits);
+                Description = Course.Description;
+                ClassroomType = Convert.ToInt32(Course.ClassroomType);
+                Term = Convert.ToInt32(Course.Term);
+                Tuition = Convert.ToDouble(Course.Tuition);
+                TotalHours = Convert.ToInt32(Course.TotalHours);
+            }
+            catch (Exception ex)
+            {
+                errorList.Add(ex.Message);              
+            }
         }
 
         /// <summary>
@@ -203,13 +230,12 @@ namespace StarTEDSystemWebApp.Components.Pages
         /// </summary>
         private void HandleSaveProgramCourse()
         {
-            if (IsValidProgramCourse())
+            if (ProgramCourseId == 0)
             {
-                ProgramCourse = new();
-
-                if (ProgramCourseId == 0)
-                {
-                    // check if the course already belongs to that program
+                
+                if (IsValidProgramCourse())
+                {                   
+                    // check if the course already belongs to the chosen program
                     if (ProgramCourseServices.ProgramCourseExists(ProgramId, CourseId))
                     {
                         errorList.Add("Course already included in the current program");
@@ -218,7 +244,7 @@ namespace StarTEDSystemWebApp.Components.Pages
                     {
                         try
                         {
-                            CreateProgramCourse();
+                            CreateProgramCourse();                   
                             ProgramCourseId = ProgramCourse.ProgramCourseId;
                             feedback = "Program Course succesfully added";
                             NavigationManager.NavigateTo($"/crud/{ProgramCourseId}");
@@ -226,15 +252,35 @@ namespace StarTEDSystemWebApp.Components.Pages
                         }
                         catch (Exception e)
                         {
-                            errorList.Add(e.Message);
+                            errorList.Add(e.Message);                            
                         }
                     }
-                }
-                else
+                }                 
+            }
+            else
+            {
+                ProgramCourse.Required = Required;
+                ProgramCourse.Comments = Comments;
+                ProgramCourse.SectionLimit = SectionLimit;
+
+                try
                 {
-                    errorList.Add($"Program course already exists {ProgramCourseId}");
+                    ProgramCourseServices.UpdateProgramCourse(ProgramCourse);                     
+                    feedback = "Program Course succesfully updated";
+                    NavigationManager.NavigateTo($"/crud");
+                    ClearFields();
                 }
-            }            
+                catch (Exception e)
+                {
+                    errorList.Add(e.Message);
+                    // Check if there's an inner exception
+                    if (e.InnerException != null)
+                    {
+                        // Log the inner exception for more details
+                        errorList.Add($"Inner Exception: {e.InnerException.Message}");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -300,7 +346,8 @@ namespace StarTEDSystemWebApp.Components.Pages
             Active = false;
             Required = false;
             Comments = "";  
-            SectionLimit = 0;
+            SectionLimit = 0;            
+            
         }
     }
 }

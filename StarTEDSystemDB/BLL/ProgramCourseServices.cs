@@ -71,6 +71,8 @@ namespace StarTEDSystemDB.BLL
         }
 
 
+        //CRUD operations
+
         //public void DeactivateProgramCourse(int id, bool isActive)
         //{
         //    ProgramCourse UpdatedProgramCourse = _context.ProgramCourses

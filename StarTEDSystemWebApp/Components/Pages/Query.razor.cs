@@ -64,10 +64,6 @@ namespace StarTEDSystemWebApp.Components.Pages
                 ProgramCourses = ProgramCourseServices.GetAllProgramCourses(ProgramId);
                 NavigationManager.NavigateTo($"/query");
             }
-        }
-
-      
-
-
+        }    
     }
 }

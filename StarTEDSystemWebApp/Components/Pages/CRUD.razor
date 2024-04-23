@@ -5,7 +5,6 @@
 @if (!IsNewProgramCourse)
 {
     <h3>CRUD - View/Edit Courses</h3>
-
 }
 else
 {
@@ -41,7 +40,7 @@ else
             <div class="row-cols-2 d-flex">
                 <div id="select-program" class="row-cols-2 d-flex">
                     <label class="col-2" for="program-name"> Program:</label>
-                    <select class="form-select" id="program-name" value="@(ProgramId == null ? 0 : ProgramId)" @onchange="HandleSelectedProgram">
+                    <select disabled="@(EditCourse ? false : true)" class="form-select" id="program-name" value="@(ProgramId == null ? 0 : ProgramId)" @onchange="HandleSelectedProgram">
                         <option selected value="0"> Select a Program</option>
                         @if (Programs != null)
                         {
@@ -56,14 +55,13 @@ else
                                 No  cursos
                             </div>
                         }
-
                     </select>
                 </div>
 
                 <div id="select-program-course" class="row-cols-2 d-flex">
                     <label for="course-name" class="col-3"> Course:</label>
-                    <select class="form-select" id="course-name" value="@(CourseId == null ? 0 : CourseId)" @onchange="HandleSelectedCourse">
-                        <option selected value="0"> Select a Course</option>
+                    <select disabled="@(EditCourse ? false : true)" class="form-select" id="course-name" value="@(CourseId == null ? "" : CourseId)" @onchange="HandleSelectedCourse">
+                        <option selected value=""> Select a Course</option>
                         @if (CoursesList != null)
                         {
                             foreach (var c in CoursesList)
@@ -115,11 +113,11 @@ else
                     <div class="row-cols-2 d-flex">
                         <div class="col-5 mx-2 my-0">
                             <label for="required" class="form-label col-7 ">Required:</label>
-                            <input class="form-check-input" type="checkbox" id="required" checked="@(Required ? true : false)" />
+                            <input class="form-check-input" type="checkbox" id="required" @bind="Required"/>
                         </div>
                         <div class="col-5 justify-content-end d-flex my-1">
                             <label for="active" class="form-label">Active:</label>
-                            <input class="form-check-input col-6" type="checkbox" id="active" @bind="Active">
+                            <input class="form-check-input col-6" disabled="@(EditCourse ? false : true)" type="checkbox" id="active" @bind="Active">
                         </div>                        
                     </div>
                     <div class="row-cols-2 d-flex">
@@ -130,24 +128,20 @@ else
                 </section>
             </div>
             <section id="section-three" class="d-flex">
-
-                <div id="menu-buttons" class="w-75 m-auto d-flex">                    
+                <div id="menu-buttons" class="w-75 m-auto d-flex">                      
                     <div>
-                        <button class="btn btn-outline-info" @onclick="HandleSaveProgramCourse">Save Course</button>
+                        <button class="btn btn-outline-info" @onclick="HandleSaveProgramCourse">@(EditCourse ? "Save Course": "Update Course")</button>
                     </div>
                     <div hidden="@IsNewProgramCourse">
                         <button class="btn btn-danger" @onclick="HandleDeactivate">Deactivate Course</button>
                     </div>
-
                     <div>
                         <a href="/query" class="btn btn-outline-danger">Cancel</a>
                     </div>
-
                     <div>
                         <button class="btn btn-outline-primary" @onclick="ClearFields">Clear</button>
                     </div>
                 </div>
-
             </section>
          </fieldset>
     </div>
