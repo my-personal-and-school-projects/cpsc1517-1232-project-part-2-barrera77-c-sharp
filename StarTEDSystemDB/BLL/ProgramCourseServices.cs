@@ -109,7 +109,7 @@ namespace StarTEDSystemDB.BLL
             {
                 throw new ArgumentNullException("Course cannot be null", new ArgumentNullException());
             }
-            programCourse.Active = true;
+            programCourse.Active = false;
             UpdateProgramCourse(programCourse);
         }
 
